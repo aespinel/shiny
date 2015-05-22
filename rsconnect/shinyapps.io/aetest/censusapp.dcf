@@ -1,0 +1,8 @@
+name: censusapp
+account: aetest
+server: shinyapps.io
+bundleId: 191309
+url: https://aetest.shinyapps.io/censusapp
+when: 1432330262.66881
+asMultiple: FALSE
+asStatic: FALSE
