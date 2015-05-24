@@ -5,8 +5,8 @@ shinyUI(fluidPage(
   
   sidebarLayout(
     sidebarPanel(
-      helpText("Create demographic maps with 
-        information from the 2010 US Census."),
+      helpText("Demographic maps with 
+        data from the 2010 US Census."),
       
       selectInput("var", 
                   label = "Choose a race to display",
