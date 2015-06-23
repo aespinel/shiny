@@ -1,0 +1,165 @@
+---
+title       : Races in USA
+subtitle    : Based on census 2010
+author      : Alvaro Espinel
+job         : Data Science
+framework   : io2012        # {io2012, html5slides, shower, dzslides, ...}
+highlighter : highlight.js  # {highlight.js, prettify, highlight}
+hitheme     : tomorrow      # 
+widgets     : []            # {mathjax, quiz, bootstrap}
+mode        : selfcontained # {standalone, draft}
+knit        : slidify::knit2slides
+---
+
+## Race Distribution  in USA
+## Based on US census 2010
+
+
+# Introduction
+
+This presentation contains the elements included in the shiny application (ui.R, server.R and helpers.R) to read the data associated to the Racial distribution by county in the United Sataes of America (2010).
+
+```{r, echo=FALSE}
+library(maps)
+library(mapproj)
+counties <- readRDS("data/counties.rds")
+source("helpers.R")
+head(counties)
+```
+
+
+
+--- .class #id 
+
+### COMPONENTS
+## The User Interfase ui.R component
+#
+
+In this component the Panel and Side Bar title are declared. The widget to select racial type and the minimun and maxium percentage desire to display.
+
+
+```{r, eval=FALSE, size= "small"}
+shinyUI(fluidPage(
+  titlePanel("Racial Distribution in USA"),
+  
+  sidebarLayout(
+    sidebarPanel(
+      helpText("Demographic maps with 
+        data from the 2010 US Census."),
+      
+      :
+      :
+    
+    mainPanel(plotOutput("map"))
+  )
+))
+```
+
+
+
+--- .class #id 
+
+## COMPONENTS: ui.R (2) 
+#
+
+In this part of the ui.R file are selected the input constraints
+#
+
+
+
+```{r, eval=FALSE}
+
+:
+:
+ selectInput("var", 
+                  label = "Choose a race to display",
+                  choices = c("Percent White", "Percent Black",
+                              "Percent Hispanic", "Percent Asian"),
+                  selected = "Percent White"),
+      
+      sliderInput("range", 
+                  label = "Range of interest:",
+                  min = 0, max = 100, value = c(0, 100))
+:
+```
+
+
+--- .class #id 
+
+## COMPONENTS: the server.R
+
+in the first part the libraries are declared for map management (maps and mapproj, also the code to read data)
+
+```{r}
+library(maps)
+library(mapproj)
+counties <- readRDS("data/counties.rds")
+source("helpers.R")
+```
+```{r, eval=FALSE}
+shinyServer(
+  function(input, output) {
+    output$map <- renderPlot({
+      args <- switch(input$var,
+                     "Percent White" = list(counties$white, "darkgreen", "% White"),
+                     "Percent Black" = list(counties$black, "black", "% Black"),
+                     "Percent Hispanic" = list(counties$hispanic, "darkorange", "% Hispanic"),
+                     "Percent Asian" = list(counties$asian, "darkviolet", "% Asian"))
+      
+      args$min <- input$range[1]
+      args$max <- input$range[2]
+      
+      do.call(percent_map, args)
+    })
+  }
+)
+```
+
+
+--- .class #id 
+
+## Final presentation
+```{r, echo=FALSE}
+server <- function(input, output) {
+    output$map <- renderPlot({
+    args <- switch(input$var,
+                     "Percent White" = list(counties$white, "darkgreen", "% White"),
+                     "Percent Black" = list(counties$black, "black", "% Black"),
+                     "Percent Hispanic" = list(counties$hispanic, "darkorange", "% Hispanic"),
+                     "Percent Asian" = list(counties$asian, "darkviolet", "% Asian"))
+      
+      args$min <- input$range[1]
+      args$max <- input$range[2]
+      
+      do.call(percent_map, args)
+    })
+  }
+
+ui <- fluidPage(
+  titlePanel("Racial Distribution in USA"),
+  
+  sidebarLayout(
+    sidebarPanel(
+      helpText("Demographic maps with 
+        data from the 2010 US Census."),
+      
+      selectInput("var", 
+                  label = "Choose a race to display",
+                  choices = c("Percent White", "Percent Black",
+                              "Percent Hispanic", "Percent Asian"),
+                  selected = "Percent White"),
+      
+      sliderInput("range", 
+                  label = "Range of interest:",
+                  min = 0, max = 100, value = c(0, 100))
+    ),
+    
+    mainPanel(plotOutput("map"))
+  )
+)
+
+shinyApp(ui = ui, server = server){r}
+
+```
+
+

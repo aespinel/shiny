@@ -12,7 +12,7 @@
   <link rel="stylesheet" href="libraries/frameworks/io2012/css/phone.css" 
     media="only screen and (max-device-width: 480px)" >
   <link rel="stylesheet" href="libraries/frameworks/io2012/css/slidify.css" >
-  <link rel="stylesheet" href="libraries/highlighters/highlight.js/css/default.css" />
+  <link rel="stylesheet" href="libraries/highlighters/highlight.js/css/tomorrow.css" />
   <base target="_blank"> <!-- This amazingness opens all links in a new tab. -->  <link rel=stylesheet href="./assets/css/ribbons.css"></link>
 
   
@@ -33,7 +33,7 @@
         <slide class="title-slide segue nobackground">
   <hgroup class="auto-fadein">
     <h1>Races in USA</h1>
-    <h2>Distribution by county based on US census 2010</h2>
+    <h2>Based on census 2010</h2>
     <p>Alvaro Espinel<br/>Data Science</p>
   </hgroup>
   <article></article>  
@@ -43,20 +43,148 @@
     <!-- SLIDES -->
     <slide class="" id="slide-1" style="background:;">
   <hgroup>
-    <h2>Racial Distribution in USA</h2>
+    <h2>Race Distribution  in USA</h2>
   </hgroup>
   <article data-timings="">
     <h2>Based on US census 2010</h2>
+
+<h1>Introduction</h1>
+
+<p>This presentation contains the elements included in the shiny application (ui.R, server.R and helpers.R) to read the data associated to the Racial distribution by county in the United Sataes of America (2010).</p>
+
+<pre><code>##              name total.pop white black hispanic asian
+## 1 alabama,autauga     54571  77.2  19.3      2.4   0.9
+## 2 alabama,baldwin    182265  83.5  10.9      4.4   0.7
+## 3 alabama,barbour     27457  46.8  47.8      5.1   0.4
+## 4    alabama,bibb     22915  75.0  22.9      1.8   0.1
+## 5  alabama,blount     57322  88.9   2.5      8.1   0.2
+## 6 alabama,bullock     10914  21.9  71.0      7.1   0.2
+</code></pre>
+
   </article>
   <!-- Presenter Notes -->
 </slide>
 
 <slide class="class" id="id" style="background:;">
   <hgroup>
-    <h2>Slide 2</h2>
+    <h3>COMPONENTS</h3>
   </hgroup>
   <article data-timings="">
-    
+    <h2>The User Interfase ui.R component</h2>
+
+<p>#</p>
+
+<p>In this component the Panel and Side Bar title are declared. The widget to select racial type and the minimun and maxium percentage desire to display.</p>
+
+<pre><code class="r">shinyUI(fluidPage(
+  titlePanel(&quot;Racial Distribution in USA&quot;),
+
+  sidebarLayout(
+    sidebarPanel(
+      helpText(&quot;Demographic maps with 
+        data from the 2010 US Census.&quot;),
+
+      :
+      :
+
+    mainPanel(plotOutput(&quot;map&quot;))
+  )
+))
+</code></pre>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="class" id="id" style="background:;">
+  <hgroup>
+    <h2>COMPONENTS: ui.R (2)</h2>
+  </hgroup>
+  <article data-timings="">
+    <p>#</p>
+
+<p>In this part of the ui.R file are selected the input constraints
+#</p>
+
+<pre><code class="r">:
+:
+ selectInput(&quot;var&quot;, 
+                  label = &quot;Choose a race to display&quot;,
+                  choices = c(&quot;Percent White&quot;, &quot;Percent Black&quot;,
+                              &quot;Percent Hispanic&quot;, &quot;Percent Asian&quot;),
+                  selected = &quot;Percent White&quot;),
+
+      sliderInput(&quot;range&quot;, 
+                  label = &quot;Range of interest:&quot;,
+                  min = 0, max = 100, value = c(0, 100))
+:
+</code></pre>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="class" id="id" style="background:;">
+  <hgroup>
+    <h2>COMPONENTS: the server.R</h2>
+  </hgroup>
+  <article data-timings="">
+    <p>in the first part the libraries are declared for map management (maps and mapproj, also the code to read data)</p>
+
+<pre><code class="r">library(maps)
+library(mapproj)
+counties &lt;- readRDS(&quot;data/counties.rds&quot;)
+source(&quot;helpers.R&quot;)
+</code></pre>
+
+<pre><code class="r">shinyServer(
+  function(input, output) {
+    output$map &lt;- renderPlot({
+      args &lt;- switch(input$var,
+                     &quot;Percent White&quot; = list(counties$white, &quot;darkgreen&quot;, &quot;% White&quot;),
+                     &quot;Percent Black&quot; = list(counties$black, &quot;black&quot;, &quot;% Black&quot;),
+                     &quot;Percent Hispanic&quot; = list(counties$hispanic, &quot;darkorange&quot;, &quot;% Hispanic&quot;),
+                     &quot;Percent Asian&quot; = list(counties$asian, &quot;darkviolet&quot;, &quot;% Asian&quot;))
+
+      args$min &lt;- input$range[1]
+      args$max &lt;- input$range[2]
+
+      do.call(percent_map, args)
+    })
+  }
+)
+</code></pre>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="class" id="id" style="background:;">
+  <hgroup>
+    <h2>Slide 5</h2>
+  </hgroup>
+  <article data-timings="">
+    <p>Final presentation
+```server &lt;- function(input, output) {
+  output$distPlot &lt;- renderPlot({
+    hist(rnorm(input$obs), col = &#39;darkgray&#39;, border = &#39;white&#39;)
+  })
+}</p>
+
+<p>ui &lt;- fluidPage(
+  sidebarLayout(
+    sidebarPanel(
+      sliderInput(&quot;obs&quot;, &quot;Number of observations:&quot;, min = 10, max = 500, value = 100)
+    ),
+    mainPanel(plotOutput(&quot;distPlot&quot;))
+  )
+)</p>
+
+<p>shinyApp(ui = ui, server = server){r}</p>
+
+<pre><code>
+</code></pre>
+
   </article>
   <!-- Presenter Notes -->
 </slide>
@@ -67,14 +195,32 @@
     <ul>
       <li>
       <a href="#" target="_self" rel='tooltip' 
-        data-slide=1 title='Racial Distribution in USA'>
+        data-slide=1 title='Race Distribution  in USA'>
          1
       </a>
     </li>
     <li>
       <a href="#" target="_self" rel='tooltip' 
-        data-slide=2 title='Slide 2'>
+        data-slide=2 title='COMPONENTS'>
          2
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=3 title='COMPONENTS: ui.R (2)'>
+         3
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=4 title='COMPONENTS: the server.R'>
+         4
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=5 title='Slide 5'>
+         5
       </a>
     </li>
   </ul>
